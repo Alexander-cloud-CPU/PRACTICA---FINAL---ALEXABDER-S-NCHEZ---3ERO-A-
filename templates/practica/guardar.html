@@ -1,0 +1,152 @@
+{% extends "index.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<style>
+    /* Estilos generales */
+    body {
+        background-color: #f8f9fa; /* Fondo claro para toda la página */
+        color: #333; /* Texto en color negro para buena legibilidad */
+    }
+
+    .text-dark {
+        color: #000; /* Texto negro para encabezados */
+    }
+
+    .booking-form-body {
+        background-color: #fff; /* Fondo blanco para el formulario */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para el formulario */
+    }
+
+    .form-control {
+        border: 1px solid #ced4da; /* Borde sutil para los campos del formulario */
+        border-radius: 4px; /* Bordes redondeados */
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075); /* Sombra interior */
+    }
+
+    .form-control:focus {
+        border-color: #80bdff; /* Color del borde al enfocar el campo */
+        outline: none; /* Elimina el borde por defecto al enfocar */
+        box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Sombra exterior */
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .custom-form {
+        margin-top: 20px;
+    }
+
+    #map {
+        height: 300px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd; /* Borde sutil para el mapa */
+        border-radius: 4px; /* Bordes redondeados para el mapa */
+    }
+</style>
+
+<h2 class="text-dark">Agregar Hospitales</h2>
+<div class="booking-form-body">
+    <a href="/hospitales" class="btn btn-danger">VOLVER</a>
+    <form id="form" class="custom-form booking-form" action="/hospitales/guardar" method="post" role="form">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-12">
+                <input type="text" name="nombre" class="form-control mb-2" placeholder="Ingrese el nombre" required>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <input type="text" name="horario" class="form-control mb-2" placeholder="Horario" required>
+            </div>
+            <div class="col-lg-12 col-12">
+                <div id="map"></div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <input type="text" name="direccion" class="form-control mb-2" placeholder="Ingrese la dirección" required>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <input type="text" id="coordenadas" name="coordenadas" class="form-control mb-2" placeholder="Coordenadas" readonly>
+                <input type="hidden" id="latitud" name="latitud">
+                <input type="hidden" id="longitud" name="longitud">
+            </div>
+            <div class="col-lg-4 col-md-10 col-8 mx-auto mt-2">
+                <button id="boton" type="submit" class="form-control btn btn-success">Guardar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var map = L.map('map').setView([-1.831239, -78.183406], 7); // Coordenadas de Ecuador
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        var marker = L.marker([-1.831239, -78.183406]).addTo(map)
+            .bindPopup('Seleccione la ubicación del hospital')
+            .openPopup();
+
+        map.on('click', function (e) {
+            var coord = e.latlng;
+            var lat = coord.lat;
+            var lng = coord.lng;
+            marker.setLatLng(coord).update();
+            document.getElementById('coordenadas').value = lat + ", " + lng;
+            document.getElementById('latitud').value = lat;
+            document.getElementById('longitud').value = lng;
+            getAddress(lat, lng);
+        });
+
+        function getAddress(lat, lng) {
+            var url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    var address = data.address;
+                    var components = [];
+                    if (address.road) components.push(address.road);
+                    if (address.suburb) components.push(address.suburb);
+                    if (address.city || address.town || address.village) components.push(address.city || address.town || address.village);
+                    var mainAddress = components.join(', ');
+                    document.querySelector('input[name="direccion"]').value = mainAddress;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    });
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "index.html" %}
+{% block content %}
+<style>
+    /* Estilo general para el texto */
+    .text-white {
+        color: #000; /* Cambia el color del texto a negro */
+    }
+
+    /* Estilo para la tabla */
+    #tabla {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #tabla thead {
+        background-color: #f0f0f0; /* Color de fondo para el encabezado */
+    }
+
+    #tabla th, #tabla td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd; /* Línea de separación entre filas */
+    }
+
+    #tabla tr:nth-child(even) {
+        background-color: #f9f9f9; /* Color de fondo alternativo para las filas pares */
+    }
+
+    #tabla tr:hover {
+        background-color: #eaeaea; /* Color de fondo al pasar el ratón sobre una fila */
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        $('#tipo').change(function() {
+            create();
+        });
+    });
+    
+    function create() {
+        var aux = $("#tipo").prop("checked");
+        if (aux)
+            $("#link").attr("href", "/hospitales/2");
+        else
+            $("#link").attr("href", "/hospitales/1");
+    }
+</script>
+
+<h2 class="text-dark">Lista de Hospitales</h2>
+<div class="booking-form-body">
+    <a href="/hospitales/agregar" class="btn btn-danger">AGREGAR</a>
+    <a href="/hospitales/grafo_hospital" target="_blank" class="btn btn-success">VER GRAFO</a>
+    <a href="/hospitales/grafo_ver_admin" class="btn btn-warning">Administrar Grafo</a>
+    <a href="/hospitales/recorrido" class="btn btn-dark">Recorrido</a>
+
+    <table id="tabla" class="table text-dark">
+        <thead>
+            <tr>
+                <th>Nro</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Horario</th>
+                <th>Longitud</th>
+                <th>Latitud</th>
+                <th>Acciones</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lista %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.direccion }}</td>
+                    <td>{{ item.horario }}</td>
+                    <td>{{ item.longitud }}</td>
+                    <td>{{ item.latitud }}</td>
+                    <td><a href="/hospitales/editar/{{item.id}}" class="btn btn-info">Modificar</a></td>
+                    <td><a href="/hospitales/eliminar/{{ item.id }}" class="btn btn-danger">Eliminar</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

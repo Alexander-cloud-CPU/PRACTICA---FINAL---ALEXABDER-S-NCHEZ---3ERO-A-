@@ -1,0 +1,177 @@
+{% extends "index.html" %}
+{% block content %}
+<style>
+    /* Estilo general para el texto */
+    .text-dark {
+        color: #333; /* Cambia el color del texto a un gris oscuro */
+    }
+
+    /* Estilo para los botones */
+    .btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    /* Estilo para la tabla */
+    #tabla {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #tabla thead {
+        background-color: #f0f0f0; /* Color de fondo para el encabezado */
+    }
+
+    #tabla th, #tabla td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd; /* Línea de separación entre filas */
+    }
+
+    #tabla tr:nth-child(even) {
+        background-color: #f9f9f9; /* Color de fondo alternativo para las filas pares */
+    }
+
+    #tabla tr:hover {
+        background-color: #eaeaea; /* Color de fondo al pasar el ratón sobre una fila */
+    }
+
+    /* Estilo para las alertas */
+    .alert {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Estilo para los formularios */
+    .booking-form-body {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+        margin-bottom: 15px;
+    }
+
+    .card {
+        margin: 20px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+</style>
+
+<h2 class="text-dark">Crear Adyacencias</h2>
+<div class="booking-form-body">
+    <div class="row" style="margin: 20px;">
+        <div class="card" style="padding: 20px;">
+            <div class="card-header">
+                <h5>Agregar Adyacencias</h5>
+            </div>
+            <div class="card-body">
+                <!-- Mensajes Flash -->
+                {% with messages = get_flashed_messages(category_filter='error', with_categories=true) %}
+                    {% if messages %}
+                        <div class="alert alert-danger">
+                            {% for category, message in messages %}
+                                <p class="mb-0">{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <form id="form" class="row" action="{{ url_for('router.crear_adyacencias') }}" method="post" role="form">
+                    <div class="col-lg-6 col-12 mb-3">
+                        <label for="origen">Origen:</label>
+                        <select id="origen" class="form-control" name="origen" required>
+                            {% for item in lista %}
+                                <option value="{{item.id}}">{{item.nombre}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-6 col-12 mb-3">
+                        <label for="destino">Destino:</label>
+                        <select id="destino" class="form-control" name="destino" required>
+                            {% for item in lista %}
+                                <option value="{{item.id}}">{{item.nombre}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-6 col-12 mb-3">
+                        <button id="boton" type="submit" class="btn btn-success">Agregar</button>
+                    </div>
+                    <div class="col-lg-6 col-12 mb-3">
+                        <a href="/hospitales" class="btn btn-danger">Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="tabla" class="table table-bordered text-dark">
+            <thead class="bg-secondary text-white">
+                <tr>
+                    <th width="150">-----</th>
+                    {% for item in lista %}
+                        <th>{{item.nombre}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in lista %}
+                    <tr>
+                        <td>{{item.nombre}}</td>
+                        {% for adys in matris[loop.index0] %}
+                            <td>{{ adys }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
